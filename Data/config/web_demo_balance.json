@@ -1,6 +1,6 @@
 {
   "economy": {
-    "startingGold": 7,
+    "startingGold": 8,
     "treeCost": 1,
     "wallCost": 2,
     "towerCost": 3,
@@ -12,8 +12,8 @@
     "landmarkDailyIncome": 2
   },
   "timing": {
-    "daySeconds": 50,
-    "duskSeconds": 12,
+    "daySeconds": 75,
+    "duskSeconds": 15,
     "nightSeconds": 24
   },
   "player": {
@@ -29,13 +29,13 @@
     "buildSeconds": 3.4
   },
   "combat": {
-    "campHp": 12,
+    "campHp": 14,
     "wallHp": 8,
     "enemyHp": 4,
-    "enemySpeed": 0.92,
+    "enemySpeed": 0.8,
     "enemyDamage": 1,
     "enemyAttackSeconds": 1.25,
-    "enemySpawnSeconds": 4.2,
+    "enemySpawnSeconds": 6,
     "towerRange": 3.4,
     "towerDamage": 2,
     "towerFireSeconds": 1.35,

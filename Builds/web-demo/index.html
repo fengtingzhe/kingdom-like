@@ -26,6 +26,10 @@
           <button id="pause-button" class="icon-button" type="button" aria-label="pause">
             <span class="pause-icon"></span>
           </button>
+          <button id="console-button" class="console-button" type="button" aria-label="open console" aria-expanded="false">
+            <span class="console-icon"></span>
+            Console
+          </button>
         </div>
 
         <div id="objective" class="objective"></div>
@@ -36,6 +40,22 @@
         </button>
         <div id="event-log" class="event-log" aria-live="polite"></div>
       </section>
+
+      <aside id="console-panel" class="console-panel" aria-label="console panel" aria-hidden="true">
+        <div class="console-header">
+          <h2>Console</h2>
+          <button id="console-close-button" class="icon-button" type="button" aria-label="close console">
+            <span class="close-icon"></span>
+          </button>
+        </div>
+        <div class="console-control">
+          <label for="camera-zoom-slider">镜头缩放</label>
+          <div class="range-row">
+            <input id="camera-zoom-slider" type="range" min="0.5" max="50" step="0.1" value="1.2">
+            <strong id="camera-zoom-value">120%</strong>
+          </div>
+        </div>
+      </aside>
 
       <section id="start-overlay" class="overlay">
         <div class="modal">

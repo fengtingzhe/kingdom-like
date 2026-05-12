@@ -1,8 +1,8 @@
 (() => {
-  const CONFIG_URL = "/Data/config/web_demo_balance.json";
+  const CONFIG_URL = "../../Data/config/web_demo_balance.json";
   const DEFAULT_CONFIG = {
     economy: {
-      startingGold: 7,
+      startingGold: 8,
       treeCost: 1,
       wallCost: 2,
       towerCost: 3,
@@ -14,8 +14,8 @@
       landmarkDailyIncome: 2
     },
     timing: {
-      daySeconds: 50,
-      duskSeconds: 12,
+      daySeconds: 75,
+      duskSeconds: 15,
       nightSeconds: 24
     },
     player: {
@@ -31,13 +31,13 @@
       buildSeconds: 3.4
     },
     combat: {
-      campHp: 12,
+      campHp: 14,
       wallHp: 8,
       enemyHp: 4,
-      enemySpeed: 0.92,
+      enemySpeed: 0.8,
       enemyDamage: 1,
       enemyAttackSeconds: 1.25,
-      enemySpawnSeconds: 4.2,
+      enemySpawnSeconds: 6,
       towerRange: 3.4,
       towerDamage: 2,
       towerFireSeconds: 1.35,
@@ -79,12 +79,20 @@
     resultTitle: document.getElementById("result-title"),
     resultCopy: document.getElementById("result-copy"),
     restart: document.getElementById("restart-button"),
-    pause: document.getElementById("pause-button")
+    pause: document.getElementById("pause-button"),
+    consoleButton: document.getElementById("console-button"),
+    consoleClose: document.getElementById("console-close-button"),
+    consolePanel: document.getElementById("console-panel"),
+    cameraZoomSlider: document.getElementById("camera-zoom-slider"),
+    cameraZoomValue: document.getElementById("camera-zoom-value")
   };
 
   let config = DEFAULT_CONFIG;
   let state = null;
   let lastFrame = 0;
+  const settings = {
+    cameraZoom: 1.2
+  };
   const keys = new Set();
   const view = {
     width: 0,
@@ -198,6 +206,8 @@
       interaction: null,
       landmarkRepaired: false,
       finalNightArmed: false,
+      firstTreeCleared: false,
+      treeClearObjectiveTimer: 0,
       clearedCountAtStart: tiles.filter((tile) => tile.state === "cleared").length
     };
   }
@@ -210,7 +220,8 @@
     canvas.width = Math.floor(rect.width * view.dpr);
     canvas.height = Math.floor(rect.height * view.dpr);
     ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
-    view.tileW = Math.max(62, Math.min(96, rect.width / 11.8, rect.height / 6.4));
+    const baseTileW = Math.max(62, Math.min(96, rect.width / 11.8, rect.height / 6.4));
+    view.tileW = baseTileW;
     view.tileH = view.tileW * 0.52;
     view.originX = rect.width * 0.5;
     view.originY = Math.max(92, rect.height * 0.13);
@@ -224,14 +235,38 @@
   }
 
   function screenToTile(clientX, clientY) {
-    const rect = canvas.getBoundingClientRect();
-    const sx = clientX - rect.left;
-    const sy = clientY - rect.top;
-    const dx = (sx - view.originX) / (view.tileW / 2);
-    const dy = (sy - view.originY) / (view.tileH / 2);
+    const world = screenToWorld(clientX, clientY);
+    const dx = (world.x - view.originX) / (view.tileW / 2);
+    const dy = (world.y - view.originY) / (view.tileH / 2);
     return {
       x: clamp((dy + dx) / 2, 0.05, config.level.width - 0.05),
       y: clamp((dy - dx) / 2, 0.05, config.level.height - 0.05)
+    };
+  }
+
+  function getCameraFocus() {
+    if (!state || !state.player) {
+      return project(config.level.width * 0.5, config.level.height * 0.5);
+    }
+    return project(state.player.x, state.player.y, 0);
+  }
+
+  function screenToWorld(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    const sx = clientX - rect.left;
+    const sy = clientY - rect.top;
+    const focus = getCameraFocus();
+    return {
+      x: (sx - view.width * 0.5) / settings.cameraZoom + focus.x,
+      y: (sy - view.height * 0.5) / settings.cameraZoom + focus.y
+    };
+  }
+
+  function worldToScreen(point) {
+    const focus = getCameraFocus();
+    return {
+      x: (point.x - focus.x) * settings.cameraZoom + view.width * 0.5,
+      y: (point.y - focus.y) * settings.cameraZoom + view.height * 0.5
     };
   }
 
@@ -591,8 +626,15 @@
     updateDefense(dt);
     updateParticles(dt);
     updateTileFlash(dt);
+    updateObjectiveTimers(dt);
     state.interaction = getInteraction();
     updateUi();
+  }
+
+  function updateObjectiveTimers(dt) {
+    if (state.treeClearObjectiveTimer > 0) {
+      state.treeClearObjectiveTimer = Math.max(0, state.treeClearObjectiveTimer - dt);
+    }
   }
 
   function updatePhase(dt) {
@@ -611,7 +653,7 @@
 
     if (state.phase === "dusk") {
       state.phase = "night";
-      state.spawnTimer = 0.8;
+      state.spawnTimer = config.combat.enemySpawnSeconds * 0.7;
       if (state.landmarkRepaired) {
         state.finalNightArmed = true;
       }
@@ -763,6 +805,8 @@
     if (order.type === "chop") {
       order.tile.state = "cleared";
       order.tile.flash = 1;
+      state.firstTreeCleared = true;
+      state.treeClearObjectiveTimer = 12;
       addMessage("树倒下了，王国控制范围扩大。");
       const feature = state.featureMap.get(keyOf(order.tile.x, order.tile.y));
       if (feature && feature.type !== "danger") {
@@ -963,9 +1007,7 @@
   }
 
   function getObjective() {
-    const wallBuilt = state.features.some((feature) => feature.type === "wall" && feature.built && feature.hp > 0);
-    const towerBuilt = state.features.some((feature) => feature.type === "tower" && feature.built);
-    const clearedNow = state.tiles.filter((tile) => tile.state === "cleared").length;
+    const landmark = state.features.find((feature) => feature.type === "landmark");
 
     if (state.landmarkRepaired && state.finalNightArmed) {
       return "目标：守住当前夜晚，保护已修复的旧地标。";
@@ -973,13 +1015,16 @@
     if (state.landmarkRepaired) {
       return "目标：等待夜晚来袭，守住修复后的旧地标。";
     }
-    if (wallBuilt || towerBuilt) {
-      return "目标：继续向东清理边界，把旧地标纳入可修复范围。";
+    if (state.treeClearObjectiveTimer > 0) {
+      return "目标：边界扩大了。寻找宝箱、流民或建筑节点，用金币做取舍。";
     }
-    if (clearedNow >= state.clearedCountAtStart + 3) {
-      return "目标：在露出的节点建墙或哨塔，为夜晚做准备。";
+    if (landmark && landmark.discovered) {
+      return "目标：旧地标已发现。清理边界到它附近，才能修复。";
     }
-    return "目标：靠近边界树，投金币命令工人清理森林。";
+    if (state.firstTreeCleared) {
+      return "目标：边界扩大了。寻找宝箱、流民或建筑节点，用金币做取舍。";
+    }
+    return "目标：探索森林，找到可砍边界树。投金币清理边界。";
   }
 
   function updateUi() {
@@ -1024,14 +1069,24 @@
     if (!state) {
       return;
     }
-    drawTiles();
-    drawFeaturesAndEntities();
-    drawParticles();
-    drawInteraction();
+    drawWorld();
     drawPhaseOverlay();
     if (state.paused && state.running) {
       drawPaused();
     }
+  }
+
+  function drawWorld() {
+    const focus = getCameraFocus();
+    ctx.save();
+    ctx.translate(view.width * 0.5, view.height * 0.5);
+    ctx.scale(settings.cameraZoom, settings.cameraZoom);
+    ctx.translate(-focus.x, -focus.y);
+    drawTiles();
+    drawFeaturesAndEntities();
+    drawParticles();
+    drawInteraction();
+    ctx.restore();
   }
 
   function drawSky() {
@@ -1052,18 +1107,29 @@
     const p = project(tile.x + 0.5, tile.y + 0.5);
     const border = isBorderForest(tile);
     if (tile.state === "cleared") {
-      drawDiamond(p.x, p.y, view.tileW, view.tileH, "#6f8d5d", "rgba(238, 230, 200, 0.18)");
+      drawDiamond(p.x, p.y, view.tileW, view.tileH, "#7fa66b", "rgba(238, 230, 200, 0.32)");
       drawGrassLines(p.x, p.y, tile.x, tile.y);
       if (tile.flash > 0) {
-        ctx.globalAlpha = tile.flash * 0.35;
-        drawDiamond(p.x, p.y, view.tileW * 0.96, view.tileH * 0.96, "#d9c075", "transparent");
-        ctx.globalAlpha = 1;
+        drawClearFlash(p.x, p.y, tile.flash);
       }
       return;
     }
 
-    drawDiamond(p.x, p.y, view.tileW, view.tileH, border ? "#2f563a" : "#1e3528", border ? "rgba(246, 198, 75, 0.42)" : "rgba(0, 0, 0, 0.2)");
+    drawDiamond(p.x, p.y, view.tileW, view.tileH, border ? "#345f3f" : "#17291f", border ? "rgba(246, 198, 75, 0.82)" : "rgba(0, 0, 0, 0.38)");
     drawForestTile(tile, p.x, p.y, border);
+    if (border) {
+      drawBorderTreeCue(tile, p.x, p.y);
+    }
+  }
+
+  function drawClearFlash(cx, cy, flash) {
+    ctx.globalAlpha = flash * 0.42;
+    drawDiamond(cx, cy, view.tileW * 1.04, view.tileH * 1.04, "#e8ce78", "transparent");
+    ctx.globalAlpha = flash * 0.55;
+    ctx.strokeStyle = "#ffe08a";
+    ctx.lineWidth = 2;
+    drawDiamond(cx, cy, view.tileW * (1.1 + (1 - flash) * 0.42), view.tileH * (1.1 + (1 - flash) * 0.42), "transparent", "#ffe08a");
+    ctx.globalAlpha = 1;
   }
 
   function drawDiamond(cx, cy, width, height, fill, stroke) {
@@ -1128,6 +1194,45 @@
       ctx.lineWidth = 2;
       ctx.stroke();
     }
+  }
+
+  function drawBorderTreeCue(tile, cx, cy) {
+    const nearPlayer = distance(state.player.x, state.player.y, tile.x + 0.5, tile.y + 0.5) <= config.player.interactRadius + 0.25;
+    ctx.save();
+    ctx.globalAlpha = nearPlayer ? 0.95 : 0.58;
+    ctx.strokeStyle = nearPlayer ? "#ffe08a" : "rgba(246, 198, 75, 0.72)";
+    ctx.lineWidth = nearPlayer ? 3 : 2;
+    drawDiamond(cx, cy + 1, view.tileW * 0.72, view.tileH * 0.72, "transparent", ctx.strokeStyle);
+
+    const axeX = cx + view.tileW * 0.22;
+    const axeY = cy - view.tileH * 0.7;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#f2d488";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(axeX - 7, axeY + 10);
+    ctx.lineTo(axeX + 9, axeY - 10);
+    ctx.stroke();
+    ctx.fillStyle = "#d9dde0";
+    ctx.beginPath();
+    ctx.moveTo(axeX + 3, axeY - 13);
+    ctx.lineTo(axeX + 16, axeY - 8);
+    ctx.lineTo(axeX + 6, axeY - 1);
+    ctx.closePath();
+    ctx.fill();
+
+    if (nearPlayer) {
+      ctx.fillStyle = "rgba(18, 22, 19, 0.76)";
+      roundRect(cx - 16, cy - view.tileH * 0.74, 32, 18, 7);
+      ctx.fill();
+      ctx.fillStyle = "#f6c64b";
+      ctx.beginPath();
+      ctx.arc(cx, cy - view.tileH * 0.48, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#ffe48c";
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   function drawFeaturesAndEntities() {
@@ -1310,15 +1415,43 @@
   }
 
   function drawBuildNode(x, y, color, label) {
-    drawShadow(x, y + 10, 44, 14);
+    drawShadow(x, y + 12, 58, 18);
+    ctx.globalAlpha = 0.28;
+    ctx.fillStyle = "#ffe08a";
+    ctx.beginPath();
+    ctx.ellipse(x, y + 1, 36, 15, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    ctx.fillStyle = "#5e594d";
+    ctx.beginPath();
+    ctx.ellipse(x, y + 2, 30, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(246, 198, 75, 0.82)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = "#6a4327";
+    ctx.fillRect(x - 23, y - 20, 5, 23);
+    ctx.fillRect(x + 18, y - 20, 5, 23);
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.ellipse(x, y - 4, 24, 10, 0, 0, Math.PI * 2);
+    ctx.moveTo(x - 18, y - 20);
+    ctx.lineTo(x + 5, y - 13);
+    ctx.lineTo(x - 18, y - 7);
+    ctx.closePath();
     ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x + 23, y - 20);
+    ctx.lineTo(x + 5, y - 14);
+    ctx.lineTo(x + 23, y - 8);
+    ctx.closePath();
+    ctx.fill();
+
     ctx.fillStyle = "#efe2bc";
     ctx.font = "bold 13px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(label, x, y - 1);
+    ctx.fillText(label, x, y + 6);
   }
 
   function drawWorker(worker) {
@@ -1357,36 +1490,51 @@
   }
 
   function drawPlayer() {
-    const p = project(state.player.x, state.player.y, 22);
-    drawShadow(p.x, p.y + 24, 34, 12);
+    const p = project(state.player.x, state.player.y, 25);
+    drawShadow(p.x, p.y + 26, 42, 14);
     ctx.save();
     ctx.translate(p.x, p.y);
     ctx.scale(state.player.facing, 1);
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "rgba(245, 237, 220, 0.92)";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(0, -43);
+    ctx.lineTo(16, 6);
+    ctx.lineTo(-16, 6);
+    ctx.closePath();
+    ctx.stroke();
     ctx.fillStyle = "#3a5f87";
     ctx.beginPath();
-    ctx.moveTo(0, -37);
-    ctx.lineTo(13, 4);
-    ctx.lineTo(-13, 4);
+    ctx.moveTo(0, -43);
+    ctx.lineTo(16, 6);
+    ctx.lineTo(-16, 6);
     ctx.closePath();
     ctx.fill();
+    ctx.strokeStyle = "rgba(42, 56, 66, 0.85)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
     ctx.fillStyle = "#e0bc82";
     ctx.beginPath();
-    ctx.arc(0, -42, 8, 0, Math.PI * 2);
+    ctx.arc(0, -50, 10, 0, Math.PI * 2);
     ctx.fill();
+    ctx.strokeStyle = "rgba(60, 43, 30, 0.85)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
     ctx.fillStyle = "#f6c64b";
     ctx.beginPath();
-    ctx.moveTo(-9, -51);
-    ctx.lineTo(-3, -60);
-    ctx.lineTo(0, -51);
-    ctx.lineTo(5, -60);
-    ctx.lineTo(10, -51);
+    ctx.moveTo(-12, -61);
+    ctx.lineTo(-4, -72);
+    ctx.lineTo(0, -61);
+    ctx.lineTo(6, -72);
+    ctx.lineTo(12, -61);
     ctx.closePath();
     ctx.fill();
     ctx.strokeStyle = "#d6e5d7";
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(9, -22);
-    ctx.lineTo(20, -31);
+    ctx.moveTo(11, -25);
+    ctx.lineTo(24, -36);
     ctx.stroke();
     ctx.restore();
   }
@@ -1467,6 +1615,15 @@
       ctx.strokeStyle = "#ffe48c";
       ctx.stroke();
     }
+
+    const ground = project(interaction.x, interaction.y, 2);
+    ctx.globalAlpha = 0.62;
+    ctx.strokeStyle = "#ffe08a";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.ellipse(ground.x, ground.y, 34, 13, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
   }
 
   function roundRect(x, y, width, height, radius) {
@@ -1503,7 +1660,7 @@
     ctx.fillStyle = hexToRgba(color, alpha);
     ctx.fillRect(0, 0, view.width, view.height);
     if (state.phase === "night") {
-      const fire = project(state.camp.x + 0.5, state.camp.y + 0.5, 18);
+      const fire = worldToScreen(project(state.camp.x + 0.5, state.camp.y + 0.5, 18));
       const light = ctx.createRadialGradient(fire.x, fire.y, 12, fire.x, fire.y, 170);
       light.addColorStop(0, "rgba(255, 184, 74, 0.22)");
       light.addColorStop(1, "rgba(255, 184, 74, 0)");
@@ -1552,6 +1709,19 @@
     ui.pause.setAttribute("aria-label", state.paused ? "resume" : "pause");
   }
 
+  function setConsoleOpen(open) {
+    ui.consolePanel.classList.toggle("is-open", open);
+    ui.consolePanel.setAttribute("aria-hidden", open ? "false" : "true");
+    ui.consoleButton.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  function updateCameraZoom(value) {
+    settings.cameraZoom = clamp(Number(value), 0.5, 50);
+    ui.cameraZoomSlider.value = String(settings.cameraZoom);
+    ui.cameraZoomValue.textContent = `${Math.round(settings.cameraZoom * 100)}%`;
+    resizeCanvas();
+  }
+
   function frame(now) {
     if (!lastFrame) {
       lastFrame = now;
@@ -1591,11 +1761,21 @@
     ui.start.addEventListener("click", startGame);
     ui.restart.addEventListener("click", restartGame);
     ui.pause.addEventListener("click", togglePause);
+    ui.consoleButton.addEventListener("click", () => {
+      setConsoleOpen(!ui.consolePanel.classList.contains("is-open"));
+    });
+    ui.consoleClose.addEventListener("click", () => {
+      setConsoleOpen(false);
+    });
+    ui.cameraZoomSlider.addEventListener("input", (event) => {
+      updateCameraZoom(event.target.value);
+    });
   }
 
   async function init() {
     config = await loadConfig();
     state = createState();
+    updateCameraZoom(ui.cameraZoomSlider.value);
     resizeCanvas();
     bindEvents();
     updateUi();

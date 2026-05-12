@@ -1,5 +1,222 @@
 # CHANGELOG
 
+## 2026-05-12 / v0.3.4
+
+### 本轮目标
+
+修正 Console 镜头缩放逻辑：从仅改变地图投影尺寸，改为整体世界镜头缩放，并让镜头始终以主角为中心。
+
+---
+
+### 已完成
+
+- [x] 新增世界镜头渲染流程 `drawWorld()`；
+- [x] 镜头缩放改为 Canvas 世界整体 transform；
+- [x] 地图、角色、树、建筑、特效和交互提示会一起缩放；
+- [x] 镜头焦点始终使用主角位置；
+- [x] 点击移动坐标转换同步适配镜头缩放；
+- [x] 夜晚营火光照位置同步适配镜头；
+- [x] smoke test 增加世界镜头相关检查。
+
+---
+
+### 修改文件
+
+- `Builds/web-demo/game.js`
+- `Tests/web-demo-smoke.mjs`
+- `AI_TASKS/CHANGELOG.md`
+- `AI_TASKS/DEV_LOG.md`
+
+---
+
+### 试玩地址
+
+```text
+http://127.0.0.1:4173/Builds/web-demo/
+```
+
+## 2026-05-12 / v0.3.3
+
+### 本轮目标
+
+按反馈扩大 Console 中镜头缩放滑竿范围。
+
+---
+
+### 已完成
+
+- [x] 镜头缩放滑竿范围改为 50%～5000%；
+- [x] 镜头缩放 clamp 范围同步改为 `0.5`～`50`；
+- [x] 放宽 Console 中缩放数值显示宽度；
+- [x] smoke test 增加滑竿范围检查。
+
+---
+
+### 修改文件
+
+- `Builds/web-demo/index.html`
+- `Builds/web-demo/styles.css`
+- `Builds/web-demo/game.js`
+- `Tests/web-demo-smoke.mjs`
+- `AI_TASKS/CHANGELOG.md`
+- `AI_TASKS/DEV_LOG.md`
+
+---
+
+### 试玩地址
+
+```text
+http://127.0.0.1:4173/Builds/web-demo/
+```
+
+## 2026-05-12 / v0.3.2
+
+### 本轮目标
+
+根据试玩反馈处理镜头过远问题，并建立后续调试功能统一入口。
+
+---
+
+### 已完成
+
+- [x] 在 HUD 增加 `Console` 按钮；
+- [x] 新增从左侧滑入的 Console 面板；
+- [x] 在 Console 面板内新增镜头缩放滑竿；
+- [x] 将镜头缩放接入 Canvas 等距投影尺寸；
+- [x] 默认镜头缩放设为 120%，让当前画面更近；
+- [x] 增强 smoke test，检查 Console 按钮和镜头滑竿存在。
+
+---
+
+### 修改文件
+
+- `Builds/web-demo/index.html`
+- `Builds/web-demo/styles.css`
+- `Builds/web-demo/game.js`
+- `Tests/web-demo-smoke.mjs`
+- `AI_TASKS/CHANGELOG.md`
+- `AI_TASKS/DEV_LOG.md`
+
+---
+
+### 验证方式
+
+```text
+node --check Builds/web-demo/game.js
+node --check Tools/web-demo-server.mjs
+node Tests/web-demo-smoke.mjs
+```
+
+试玩地址：
+
+```text
+http://127.0.0.1:4173/Builds/web-demo/
+```
+
+## 2026-05-12 / v0.3.1
+
+### 本轮目标
+
+Playtest 修正版：不新增大型系统，不继续堆功能，只修复部署路径、补充 Web Demo README、强化可读性、降低首局压力并增强 smoke test。
+
+---
+
+### 已完成
+
+- [x] 将 `Builds/web-demo/game.js` 配置路径从绝对路径改为相对路径；
+- [x] 保留 `DEFAULT_CONFIG` fallback，直接打开 HTML 时 fetch 失败仍可使用内置配置；
+- [x] 新增 `Builds/web-demo/README.md`；
+- [x] 强化玩家角色轮廓和比例；
+- [x] 强化可砍边界树的金色描边、斧头提示和近距离金币槽提示；
+- [x] 强化墙点、塔点、地标等固定建筑节点的底座、旗帜和光圈；
+- [x] 拉大已清理区域和未清理森林的明暗差；
+- [x] 增强砍树完成后的地面闪光 / 扩散反馈；
+- [x] 降低首局压力：延长白天和黄昏，减慢敌人，降低刷怪频率，提高营火生命值，提高开局金币；
+- [x] 优化前期目标提示；
+- [x] 增强 `Tests/web-demo-smoke.mjs`。
+
+---
+
+### 修改文件
+
+- `Builds/web-demo/README.md`
+- `Builds/web-demo/game.js`
+- `Data/config/web_demo_balance.json`
+- `Tests/web-demo-smoke.mjs`
+- `AI_TASKS/CURRENT_TASK.md`
+- `AI_TASKS/CHANGELOG.md`
+- `AI_TASKS/DEV_LOG.md`
+
+---
+
+### 验证方式
+
+```text
+node --check Builds/web-demo/game.js
+node --check Tools/web-demo-server.mjs
+node Tests/web-demo-smoke.mjs
+node Tools/web-demo-server.mjs
+```
+
+浏览器验证：
+
+```text
+http://127.0.0.1:4173/Builds/web-demo/
+```
+
+结果：页面可进入，开局金币为 8，首个目标提示正常，首次砍树交互可用，工人完成砍树后目标提示切换为“边界扩大了…”，控制台无错误。
+
+---
+
+### 明确未做
+
+- 未新增多资源；
+- 未新增自由建造；
+- 未新增复杂科技树；
+- 未新增大规模战争；
+- 未新增 RTS 框选；
+- 未引入 React、Phaser、Three.js 或 npm 依赖；
+- 未修改 `DESIGN_HUB/09_DECISIONS.md`；
+- 未修改 `AI_RULES/`；
+- 未将 Web Demo 宣称为最终游戏；
+- 未移除 Godot 作为 Demo 阶段主引擎的长期决策。
+
+## 2026-05-12 / v0.0.4
+
+### 本轮目标
+
+生成一个可双击运行的 `.bat` 文件，用于自动拉起网页 Demo 服务并打开游戏页面。
+
+---
+
+### 已完成
+
+- [x] 新增 `Tools/run-web-demo.bat`；
+- [x] 双击或命令行运行时自动检查 Node.js；
+- [x] 自动选择从 4173 开始的可用端口；
+- [x] 自动启动 `Tools/web-demo-server.mjs`；
+- [x] 服务就绪后自动打开 `Builds/web-demo/` 页面。
+
+---
+
+### 修改文件
+
+- `Tools/run-web-demo.bat`
+- `AI_TASKS/CHANGELOG.md`
+- `AI_TASKS/DEV_LOG.md`
+
+---
+
+### 验证方式
+
+```text
+cmd /c Tools\run-web-demo.bat
+```
+
+验证结果：命令执行成功，服务被拉起，浏览器自动打开游戏页面。
+
+---
+
 ## 2026-05-12 / v0.0.3
 
 ### 本轮目标

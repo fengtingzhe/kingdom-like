@@ -63,6 +63,7 @@ button {
 
 .pill,
 .icon-button,
+.console-button,
 .action-button,
 .primary-button {
   border: 1px solid var(--line);
@@ -121,13 +122,31 @@ button {
   cursor: pointer;
 }
 
+.console-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 102px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--ink);
+  background: var(--panel);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 .icon-button:hover,
+.console-button:hover,
 .action-button:hover,
 .primary-button:hover {
   border-color: rgba(246, 198, 75, 0.72);
 }
 
 .pause-icon,
+.console-icon,
+.close-icon,
 .play-icon,
 .restart-icon {
   position: relative;
@@ -139,6 +158,59 @@ button {
   height: 16px;
   border-left: 4px solid var(--ink);
   border-right: 4px solid var(--ink);
+}
+
+.console-icon {
+  width: 16px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+}
+
+.console-icon::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 4px;
+  width: 5px;
+  height: 5px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.console-icon::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 5px;
+  border-bottom: 2px solid currentColor;
+}
+
+.close-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.close-icon::before,
+.close-icon::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 1px;
+  width: 2px;
+  height: 16px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.close-icon::before {
+  transform: rotate(45deg);
+}
+
+.close-icon::after {
+  transform: rotate(-45deg);
 }
 
 .play-icon {
@@ -190,6 +262,74 @@ button {
   font-size: 13px;
   line-height: 1.35;
   color: var(--muted);
+}
+
+.console-panel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 4;
+  width: min(340px, calc(100vw - 36px));
+  padding: 18px;
+  color: var(--ink);
+  background: rgba(18, 23, 21, 0.94);
+  border-right: 1px solid var(--line);
+  box-shadow: 18px 0 48px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(14px);
+  pointer-events: auto;
+  transform: translateX(-105%);
+  transition: transform 180ms ease;
+}
+
+.console-panel.is-open {
+  transform: translateX(0);
+}
+
+.console-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.console-header h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.console-control {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.console-control label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.range-row {
+  display: grid;
+  grid-template-columns: 1fr 68px;
+  align-items: center;
+  gap: 12px;
+}
+
+.range-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--gold);
+}
+
+.range-row strong {
+  color: var(--gold);
+  font-size: 13px;
+  text-align: right;
 }
 
 .action-button {
@@ -285,5 +425,9 @@ button {
   .event-log {
     right: 12px;
     max-width: none;
+  }
+
+  .console-panel {
+    padding-top: 14px;
   }
 }
