@@ -19,6 +19,28 @@
 
 ---
 
+## 当前 Demo 阶段
+
+- [ ] v0.x / Web Demo
+- [ ] v1.x / Godot Demo
+- [ ] v2.x / 可展示垂直切片
+- [ ] v3.x / 商业化验证
+
+---
+
+## 是否需要写入 NEXT_CODEX_PROMPT
+
+- [ ] 是
+- [ ] 否
+
+给 Codex 的最终提示词位置：
+
+```text
+AI_TASKS/NEXT_CODEX_PROMPT.md
+```
+
+---
+
 ## 目标
 
 本任务完成后，玩家或开发者能看到什么变化。
@@ -69,6 +91,22 @@
 
 ---
 
+## 通用 Console 要求
+
+如果本任务涉及可运行 Demo 界面，默认应包含通用 `Console` / `Dev` 按钮。
+
+通用功能只包括：
+
+- [ ] 音乐开关
+- [ ] 音效开关
+- [ ] 暂停 / 继续
+- [ ] 重置场景 / 重置 Demo
+- [ ] 显示 FPS
+
+特定游戏功能不应默认加入 Console，除非本任务明确要求。
+
+---
+
 ## 验收标准
 
 完成后必须满足：
@@ -86,4 +124,5 @@
 3. 如何验证；
 4. 有哪些风险；
 5. 是否写入了 `DESIGN_HUB/10_OPEN_QUESTIONS.md`；
-6. 是否更新了 `AI_TASKS/CHANGELOG.md`。
+6. 是否更新了 `AI_TASKS/CHANGELOG.md`；
+7. 是否更新了 `AI_TASKS/NEXT_CODEX_PROMPT.md`，如需要。
