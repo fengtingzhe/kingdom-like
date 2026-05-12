@@ -91,7 +91,8 @@ Scripts / Scenes 管实现。
 9. DESIGN_HUB/09_DECISIONS.md
 10. DESIGN_HUB/10_OPEN_QUESTIONS.md
 11. AI_TASKS/CURRENT_TASK.md
-12. AI_RULES/06_VALIDATION_CHECKLIST.md
+12. AI_TASKS/NEXT_CODEX_PROMPT.md
+13. AI_RULES/06_VALIDATION_CHECKLIST.md
 ```
 
 阅读后，AI 必须先回复：
@@ -178,7 +179,88 @@ Unity 更适合进入商业化开发阶段后再评估。
 
 ---
 
-# 7. 当前已确认的设计边界摘要
+# 7. Demo 阶段划分
+
+本项目采用“先 Web Demo，后 Godot Demo”的开发策略。
+
+## Web Demo 阶段
+
+版本号：`v0.x`
+
+目标：
+
+- 快速验证核心玩法；
+- 快速验证 UI 信息层级；
+- 快速验证资源循环；
+- 快速进行试玩反馈；
+- 为 Godot Demo 提供明确方向。
+
+默认目录：
+
+```text
+Builds/web-demo/
+Data/config/
+Tools/
+Tests/
+```
+
+## Godot Demo 阶段
+
+版本号：`v1.x`
+
+目标：
+
+- 将已经验证过的核心玩法迁移到 Godot；
+- 加入正式场景结构；
+- 加入 Godot UI；
+- 加入角色、动画、反馈和资源管理；
+- 为后续可展示垂直切片做准备。
+
+---
+
+# 8. NEXT_CODEX_PROMPT 使用规则
+
+`AI_TASKS/NEXT_CODEX_PROMPT.md` 用于保存下一轮交给 Codex 执行的完整提示词。
+
+当 ChatGPT 长对话过长、网页卡顿或上下文过重时，不应继续在聊天中堆积提示词，而应将最终确认的任务提示词写入该文件。
+
+Codex 执行任务时，应优先读取：
+
+- `AI_TASKS/NEXT_CODEX_PROMPT.md`
+- `AI_TASKS/CURRENT_TASK.md`
+- `AI_TASKS/CHANGELOG.md`
+- `AI_TASKS/DEV_LOG.md`
+
+执行完成后，Codex 应更新：
+
+- `AI_TASKS/CURRENT_TASK.md`
+- `AI_TASKS/CHANGELOG.md`
+- `AI_TASKS/DEV_LOG.md`
+- 必要时更新 `AI_TASKS/NEXT_CODEX_PROMPT.md`
+
+---
+
+# 9. 通用 Debug Console 规则
+
+所有 Demo 默认应提供一个 `Console` / `Dev` 按钮，作为开发者工具入口。
+
+Console 是 Demo 阶段的开发者工具面板，不代表最终玩家界面。
+
+通用功能只包含跨游戏类型也常用的功能：
+
+```text
+音乐开关；
+音效开关；
+暂停 / 继续；
+重置场景 / 重置 Demo；
+显示 FPS。
+```
+
+特定游戏相关功能，例如加资源、跳到白天、生成敌人、解锁节点等，不属于通用 Console 规则。如某个项目需要，应在该项目的任务卡或 `DESIGN_HUB/10_OPEN_QUESTIONS.md` 中单独确认。
+
+---
+
+# 10. 当前已确认的设计边界摘要
 
 ```text
 目标用户：泛用户，不是 SLG / RTS 核心向用户。
