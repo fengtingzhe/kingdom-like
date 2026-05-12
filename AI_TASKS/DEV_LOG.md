@@ -1,5 +1,78 @@
 # DEV_LOG：开发过程记录
 
+## 2026-05-12 / 网页端 Demo 原型
+
+### 本轮目标
+
+读取仓库内容，检查开发工具是否完备，并根据现有设计约束创建一个网页端可试玩 Demo。
+
+---
+
+### 执行过程
+
+- 按要求读取 README、AI_RULES、DESIGN_HUB、AI_TASKS 等现有文档；
+- 统计目录内容，确认当前只有文档和 `.gitkeep` 占位；
+- 检查项目内工程文件，未发现 Godot、Web 或 npm 工程入口；
+- 检查本机工具，确认 Node.js / npm / git / Python 可用，Godot 命令不可用；
+- 创建 `Data/config/web_demo_balance.json`，保存核心金币、昼夜、工人、战斗和地图配置；
+- 创建 `Builds/web-demo/index.html`、`styles.css`、`game.js`；
+- 创建 `Tools/web-demo-server.mjs`，用于从仓库根目录启动静态服务；
+- 创建 `Tests/web-demo-smoke.mjs`，用于基础文件和配置检查；
+- 运行 JS 语法检查和 smoke test。
+
+---
+
+### 实现内容
+
+- 玩家单角色移动；
+- 点击地面移动和键盘移动；
+- 金币 HUD、昼夜状态、目标提示、交互金币槽；
+- 边界树投金币交互；
+- 工人自动前往目标、砍树、清理边界；
+- 固定节点建墙、建塔、修复地标；
+- 宝箱奖励和流民招募；
+- 昼夜循环、黄昏提示、夜晚敌人袭击；
+- 木墙、营火生命值、哨塔 / 弓手自动防守；
+- 修复地标并守住夜晚后的胜利；
+- 营火被摧毁或天数耗尽后的失败。
+
+---
+
+### 验证结果
+
+已通过：
+
+```text
+node --check Builds/web-demo/game.js
+node --check Tools/web-demo-server.mjs
+node Tests/web-demo-smoke.mjs
+```
+
+---
+
+### 遇到的问题
+
+- 项目内 `Tools/` 目录没有可用开发工具；
+- 仓库未包含 `project.godot`，也未包含 Web 工程文件；
+- 已确认决策中 Demo 阶段优先使用 Godot，但用户本轮明确要求网页端 Demo。
+
+---
+
+### 解决方式
+
+- 不修改 Godot 主引擎决策；
+- 不修改 `README.md`、`DESIGN_HUB/`、`AI_RULES/`；
+- 将本轮产物作为独立 Web/H5 可试玩原型放入 `Builds/web-demo/`；
+- 使用原生浏览器能力和 Node 静态服务器，避免新增第三方依赖。
+
+---
+
+### 后续注意
+
+- 如果继续以 Godot 为主线，需要补 `project.godot` 和第一版主场景；
+- 如果继续以网页 Demo 验证玩法，需要先确认 Web/H5 是否只是展示原型，还是会成为正式目标平台；
+- 当前画面均为 Canvas 占位图形，不应视为最终美术资源。
+
 ## 2026-05-12 / 核心玩法设计沉淀
 
 ### 本轮目标

@@ -1,5 +1,87 @@
 # CHANGELOG
 
+## 2026-05-12 / v0.0.3
+
+### 本轮目标
+
+按用户要求检查项目内开发工具是否完备，并创建一个独立网页端可试玩 Demo 原型。
+
+---
+
+### 工具检查结果
+
+- [x] 仓库当前主要是文档和占位目录；
+- [x] `Tools/` 仅有 `.gitkeep`，项目内开发工具不完备；
+- [x] 未发现 `project.godot`、`package.json`、`index.html`、`.gd`、`.tscn` 等实际工程文件；
+- [x] 本机可用 Node.js v24.14.0、npm 11.9.0、git、Python；
+- [x] 未找到 Godot 命令；
+- [x] 本轮采用无第三方依赖 Web/H5 原型，不改变 Godot 主引擎决策。
+
+---
+
+### 已完成
+
+- [x] 创建 Web demo 页面；
+- [x] 创建 Canvas 游戏主逻辑；
+- [x] 创建 Web demo 样式；
+- [x] 创建 Web demo 数值配置；
+- [x] 创建本地静态服务器；
+- [x] 创建 smoke test；
+- [x] 实现玩家移动、金币 HUD、投金币交互；
+- [x] 实现工人自动砍树、边界清理；
+- [x] 实现固定节点建墙、建塔、修复地标；
+- [x] 实现昼夜循环、夜晚袭击、基础防守；
+- [x] 实现 Demo 胜负条件。
+
+---
+
+### 修改文件
+
+- `Builds/web-demo/index.html`
+- `Builds/web-demo/styles.css`
+- `Builds/web-demo/game.js`
+- `Data/config/web_demo_balance.json`
+- `Tools/web-demo-server.mjs`
+- `Tests/web-demo-smoke.mjs`
+- `AI_TASKS/CURRENT_TASK.md`
+- `AI_TASKS/CHANGELOG.md`
+- `AI_TASKS/DEV_LOG.md`
+
+---
+
+### 验证方式
+
+```text
+node --check Builds/web-demo/game.js
+node --check Tools/web-demo-server.mjs
+node Tests/web-demo-smoke.mjs
+node Tools/web-demo-server.mjs
+```
+
+打开：
+
+```text
+http://127.0.0.1:4173/Builds/web-demo/
+```
+
+---
+
+### 未完成
+
+- [ ] 未创建 Godot 项目文件；
+- [ ] 未创建 Godot 主场景；
+- [ ] 未导入正式美术资源；
+- [ ] 未做完整移动端触控 UI；
+- [ ] 未做完整数值平衡。
+
+---
+
+### 风险
+
+- 当前 Web demo 是独立 H5 原型，不代表主项目已完成 Godot 工程；
+- Web demo 使用 Canvas 占位图形，后续需要替换为正式资源或迁移到 Godot；
+- 本轮为了响应用户网页端要求，暂未推进已确认的 Godot 主工程初始化。
+
 ## 2026-05-12 / v0.0.2
 
 ### 本轮目标
