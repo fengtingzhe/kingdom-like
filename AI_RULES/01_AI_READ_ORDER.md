@@ -18,8 +18,19 @@
 9. DESIGN_HUB/09_DECISIONS.md
 10. DESIGN_HUB/10_OPEN_QUESTIONS.md
 11. AI_TASKS/CURRENT_TASK.md
-12. AI_RULES/06_VALIDATION_CHECKLIST.md
+12. AI_TASKS/NEXT_CODEX_PROMPT.md
+13. AI_RULES/06_VALIDATION_CHECKLIST.md
 ```
+
+---
+
+## NEXT_CODEX_PROMPT 说明
+
+`AI_TASKS/NEXT_CODEX_PROMPT.md` 用于保存下一轮交给 Codex 执行的完整提示词。
+
+当 ChatGPT 长对话过长、网页卡顿或上下文过重时，应将最终确认的 Codex 提示词写入该文件，避免继续在聊天中堆积超长提示词。
+
+Codex 执行任务时，必须读取该文件。
 
 ---
 
@@ -40,4 +51,5 @@
 - 不阅读规则就直接改代码；
 - 只看当前任务，不看设计边界；
 - 忽略 `DESIGN_HUB/09_DECISIONS.md`；
+- 忽略 `AI_TASKS/NEXT_CODEX_PROMPT.md`；
 - 遇到不明确问题时擅自决定。
