@@ -1016,15 +1016,15 @@
       return "目标：等待夜晚来袭，守住修复后的旧地标。";
     }
     if (state.treeClearObjectiveTimer > 0) {
-      return "目标：边界扩大了。寻找宝箱、流民或建筑节点，用金币做取舍。";
+      return "目标：边界扩大了。寻找宝箱、流民或建筑节点，继续用金币做取舍。";
     }
     if (landmark && landmark.discovered) {
-      return "目标：旧地标已发现。清理边界到它附近，才能修复。";
+      return "目标：旧地标已发现。需要把王国边界清理到地标附近，才能修复它。";
     }
     if (state.firstTreeCleared) {
-      return "目标：边界扩大了。寻找宝箱、流民或建筑节点，用金币做取舍。";
+      return "目标：边界扩大了。寻找宝箱、流民或建筑节点，继续用金币做取舍。";
     }
-    return "目标：探索森林，找到可砍边界树。投金币清理边界。";
+    return "目标：探索森林，找到可砍边界树。投金币让工人清理边界，把发现纳入营地范围。";
   }
 
   function updateUi() {

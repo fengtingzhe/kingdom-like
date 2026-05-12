@@ -2,13 +2,13 @@
 
 ## 任务名称
 
-v0.3.4 / 整体镜头缩放。
+v0.3.1 / Playtest 修正版
 
 ---
 
 ## 背景
 
-上一版已加入 Console 和镜头缩放滑竿。当前反馈是缩放仅影响地图，没有整体放缩；本轮改为世界层整体缩放，并让镜头始终以主角为中心。
+本轮按 `AI_TASKS/NEXT_CODEX_PROMPT.md` 执行 v0.3.1 Playtest 修正版要求。目标是修复部署路径、补充 Web Demo README、强化可读性、降低首局压力、增强 smoke test，并保持核心设计不变。
 
 ---
 
@@ -26,13 +26,20 @@ v0.3.4 / 整体镜头缩放。
 
 本轮只做：
 
-- 保持基础地块尺寸独立于镜头缩放；
-- 新增主角中心镜头焦点；
-- 将地图、角色、树、建筑、特效和交互提示统一放入世界层缩放；
-- 点击移动坐标同步经过镜头逆变换；
-- 夜晚营火光照位置同步适配镜头变换；
-- 增强 `Tests/web-demo-smoke.mjs`，检查世界镜头逻辑；
+- 复核 `Builds/web-demo/game.js` 配置路径为相对路径；
+- 保留 `DEFAULT_CONFIG` fallback，确保直接打开 HTML 时仍可运行；
+- 确认 `Builds/web-demo/README.md` 已补充 v0.3.1 试玩说明；
+- 补齐新手目标提示文案，使其聚焦“探索森林 → 投金币 → 工人清理 → 边界扩大”；
+- 确认可互动对象、建筑节点、已清理区域和普通森林的可读性；
+- 确认首局压力已降低；
+- 确认 smoke test 覆盖 README、配置路径、单金币经济、HTML 引用和服务脚本；
 - 更新 `AI_TASKS/CHANGELOG.md` 和 `AI_TASKS/DEV_LOG.md`。
+
+---
+
+## 保留说明
+
+此前用户明确要求的 Console 与镜头缩放调试入口继续保留；本轮不新增其功能，也不把它作为最终游戏菜单。
 
 ---
 
@@ -40,15 +47,16 @@ v0.3.4 / 整体镜头缩放。
 
 本轮明确不做：
 
-- 不创建或修改 Godot 项目；
-- 不修改 `README.md`；
-- 不修改 `DESIGN_HUB/` 核心策划文档；
-- 不修改 `AI_RULES/` 核心规则；
-- 不引入 npm 第三方依赖；
-- 不做完整商业化、后端、账号、SDK；
-- 不做自由建筑摆放、多资源经济、RTS 框选和复杂战斗；
-- 不新增 React、Phaser、Three.js 或其他大型依赖；
+- 不新增多资源；
+- 不新增自由建造；
+- 不新增复杂科技树；
+- 不新增大规模战争；
+- 不新增 RTS 框选；
+- 不引入 React、Phaser、Three.js 或 npm 依赖；
+- 不修改 `DESIGN_HUB/09_DECISIONS.md`；
+- 不修改 `AI_RULES/`；
 - 不把 Web Demo 宣称为最终游戏；
+- 不移除 Godot 作为 Demo 阶段主引擎的长期决策；
 - 不新增大型系统或复杂菜单。
 
 ---
@@ -56,7 +64,9 @@ v0.3.4 / 整体镜头缩放。
 ## 允许修改的文件
 
 - `Builds/web-demo/`
-- `Tests/`
+- `Data/config/web_demo_balance.json`
+- `Tools/web-demo-server.mjs`
+- `Tests/web-demo-smoke.mjs`
 - `AI_TASKS/CURRENT_TASK.md`
 - `AI_TASKS/CHANGELOG.md`
 - `AI_TASKS/DEV_LOG.md`
@@ -65,8 +75,7 @@ v0.3.4 / 整体镜头缩放。
 
 ## 禁止修改的文件
 
-- `README.md`
-- `DESIGN_HUB/`
+- `DESIGN_HUB/09_DECISIONS.md`
 - `AI_RULES/`
 - `project.godot`
 - 核心主场景
@@ -82,18 +91,8 @@ v0.3.4 / 整体镜头缩放。
 - 只有金币一种资源；
 - 建筑只能在固定节点建造；
 - 砍树作用是扩大王国控制范围，不产出木材；
-- 夜晚防守是扩张压力反馈，不是主玩法；
+- 夜晚防御是扩张压力反馈，不是主玩法；
 - 画面优先保证可读性。
-
----
-
-## 技术约束
-
-- 使用原生 HTML / CSS / JavaScript；
-- 使用 Canvas 渲染；
-- 不引入第三方依赖；
-- 数值优先来自 `Data/config/web_demo_balance.json`；
-- 本地运行通过 `Tools/web-demo-server.mjs`。
 
 ---
 
@@ -102,20 +101,16 @@ v0.3.4 / 整体镜头缩放。
 - [x] `node --check Builds/web-demo/game.js` 通过；
 - [x] `node --check Tools/web-demo-server.mjs` 通过；
 - [x] `node Tests/web-demo-smoke.mjs` 通过；
-- [x] 打开 `http://127.0.0.1:4173/Builds/web-demo/` 可以看到 `Console` 按钮；
-- [x] 调节镜头缩放滑竿后世界层整体缩放；
-- [x] 主角保持在镜头中心；
-- [x] 点击移动仍可响应；
-- [x] 浏览器控制台无错误。
+- [x] `http://127.0.0.1:4173/Builds/web-demo/` 可以试玩；
+- [x] 玩家能更清楚地区分主角、可砍树、普通森林、建筑节点和已清理区域；
+- [x] 首局不会因为夜晚过快或怪物过强而快速失败；
+- [x] 画面仍然只显示金币一种资源；
+- [x] 没有新增复杂菜单或大型系统。
 
 ---
 
-## 下一轮建议
-
-继续用人类试玩反馈验证：
+## 试玩地址
 
 ```text
-镜头缩放在 120%、200%、更高比例下哪一个更适合当前 Demo。
+http://127.0.0.1:4173/Builds/web-demo/
 ```
-
-下一轮如继续做调试工具，新增调试项统一放入 Console 面板。

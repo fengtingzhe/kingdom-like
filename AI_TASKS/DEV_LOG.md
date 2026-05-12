@@ -1,5 +1,47 @@
 # DEV_LOG：开发过程记录
 
+## 2026-05-12 / v0.3.1 Playtest 修正版复核
+
+### 本轮目标
+
+读取 `AI_TASKS/NEXT_CODEX_PROMPT.md`，严格按其中 v0.3.1 / Playtest 修正版任务执行：修复部署路径、补充 README、强化可读性、降低首局压力、增强 smoke test，并保持核心设计不变。
+
+---
+
+### 执行过程
+
+- 复核 README、DESIGN_HUB、AI_TASKS、Web Demo 代码、配置、服务脚本和 smoke test；
+- 确认 `CONFIG_URL` 已改为 `../../Data/config/web_demo_balance.json`；
+- 确认 `DEFAULT_CONFIG` fallback 仍保留；
+- 确认 `Builds/web-demo/README.md` 已记录 v0.3.1 / Playtest 修正版运行方式和试玩重点；
+- 将前期目标提示文案补齐为提示词指定表达；
+- 确认首局压力配置已降低，仍只显示金币一种资源；
+- 确认 smoke test 已覆盖本轮要求；
+- 保留此前用户明确要求的 Console / 镜头调试入口，本轮没有继续扩展调试功能。
+
+---
+
+### 未新增内容
+
+- 没有新增多资源；
+- 没有新增自由建造；
+- 没有新增复杂科技树；
+- 没有新增大规模战争；
+- 没有新增 RTS 框选；
+- 没有引入 React、Phaser、Three.js 或 npm 依赖；
+- 没有修改 `DESIGN_HUB/09_DECISIONS.md`；
+- 没有修改 `AI_RULES/`；
+- 没有把 Web Demo 宣称为最终游戏；
+- 没有移除 Godot 作为 Demo 阶段主引擎的长期决策。
+
+---
+
+### 试玩地址
+
+```text
+http://127.0.0.1:4173/Builds/web-demo/
+```
+
 ## 2026-05-12 / v0.3.4 整体镜头缩放
 
 ### 本轮目标

@@ -1,5 +1,41 @@
 # CHANGELOG
 
+## 2026-05-12 / v0.3.1 / Playtest 修正版复核
+
+### 本轮目标
+
+按 `AI_TASKS/NEXT_CODEX_PROMPT.md` 重新执行 v0.3.1 / Playtest 修正版要求，只做合规复核和缺口补齐，不新增大型系统。
+
+---
+
+### 已完成
+
+- [x] 复核 `Builds/web-demo/game.js` 配置路径，确认已使用相对路径；
+- [x] 保留 `DEFAULT_CONFIG` fallback；
+- [x] 确认 `Builds/web-demo/README.md` 已补充；
+- [x] 补齐前期目标提示文案；
+- [x] 确认可互动对象可读性、首局压力配置和单金币经济约束；
+- [x] 确认 smoke test 覆盖 README、配置路径、经济字段、HTML 引用和服务脚本；
+- [x] 更新 `AI_TASKS/CURRENT_TASK.md`、`AI_TASKS/CHANGELOG.md` 和 `AI_TASKS/DEV_LOG.md`；
+- [x] 没有新增多资源、自由建造、复杂科技树、大规模战争、RTS 框选或新依赖。
+
+---
+
+### 修改文件
+
+- `Builds/web-demo/game.js`
+- `AI_TASKS/CURRENT_TASK.md`
+- `AI_TASKS/CHANGELOG.md`
+- `AI_TASKS/DEV_LOG.md`
+
+---
+
+### 试玩地址
+
+```text
+http://127.0.0.1:4173/Builds/web-demo/
+```
+
 ## 2026-05-12 / v0.3.4
 
 ### 本轮目标
